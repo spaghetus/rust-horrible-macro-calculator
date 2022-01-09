@@ -23,14 +23,14 @@ pub fn generate_math(input: TokenStream) -> TokenStream {
 						n1,
 						n2,
 						match *op {
-							"+" => n1 + n2,
-							"-" => n1 - n2,
-							"*" => n1 * n2,
+							"+" => format!("{}", n1 + n2),
+							"-" => format!("{}", n1 - n2),
+							"*" => format!("{}", n1 * n2),
 							"/" =>
 								if n2 == 0 {
-									i128::MIN
+									"panic!(\"Division by zero\")".to_string()
 								} else {
-									n1 / n2
+									format!("{}", n1 / n2)
 								},
 							_ => unreachable!(),
 						}
@@ -39,10 +39,13 @@ pub fn generate_math(input: TokenStream) -> TokenStream {
 				);
 			}
 		}
-		expanded.extend(format!("(_,_)=>{},", i128::MIN).chars());
+		expanded.extend(
+			format!("(_,_)=>panic!(\"Invalid numbers, try compiling with a larger range.\"),")
+				.chars(),
+		);
 		expanded.extend("},".chars());
 	}
-	expanded.extend("_=>panic!(\"Invalid operand\"),".chars());
+	expanded.extend("_=>panic!(\"Invalid operator\"),".chars());
 	expanded.extend("}".chars());
 	expanded.parse().unwrap()
 }
